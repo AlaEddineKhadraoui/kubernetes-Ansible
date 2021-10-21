@@ -1,0 +1,9 @@
+---
+- name: Install and Configure k8s worker server
+  hosts: all
+  user: vagrant
+  become: true
+  gather_facts: yes
+  roles:
+    - k8s.worker-role
+

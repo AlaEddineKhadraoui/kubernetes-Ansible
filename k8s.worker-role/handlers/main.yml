@@ -1,0 +1,5 @@
+---
+# handlers file for esiedge.k8s.master
+#
+- name: reload firewall
+  shell: firewall-cmd --reload

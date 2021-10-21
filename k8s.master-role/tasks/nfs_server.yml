@@ -1,0 +1,46 @@
+---
+
+- name: install nfs utils
+  yum:
+    name: nfs-utils
+    state: present
+
+
+- name: create share folder
+  file:
+    path: /home/vagrant/nfs
+    state: directory
+  
+
+- name: add user to nfs groupe
+  user:
+    name: vagrant
+    groups: nfsnobody
+    append: yes
+
+- name: start and enable nfs service
+  service:
+    name: "{{item}}"
+    state: started
+    enabled: yes
+  loop:
+    #- rpcdbind
+    - nfs-server
+    - nfs-lock
+    - nfs-idmap
+
+- name: share a folder
+  lineinfile:
+    path:  /etc/exports
+    line:   /home/vagrant/nfs    192.168.121.0/24(rw,sync,no_root_squash,no_all_squash)
+      
+- name: restart nfs service
+  service:
+     name: nfs-server
+     state: restarted
+
+
+
+
+
+

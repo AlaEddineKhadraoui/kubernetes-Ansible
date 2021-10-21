@@ -1,0 +1,39 @@
+---
+# tasks file for esiedge.k8s.master
+#
+- name: configure some prerequist
+  include_tasks: prerequist.yml
+
+
+- name: install and configure k8s
+  include_tasks: install_k8s.yml
+
+- name: intializing k8s cluster
+  shell: kubeadm init
+
+- name: generating a join command
+  shell: kubeadm token create --print-join-command
+  register: join_command
+
+- name: creating file to store tocken
+  file:
+    path: join_tocken
+    state: touch
+
+
+- name: Copy join tocken to local file
+  copy:
+    content: "{{ join_command.stdout }}"
+    dest: join_tocken
+
+
+- name: Copying required files
+  shell: "{{item}}"
+  loop:  
+    - mkdir -p $HOME/.kube
+    - cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+    - chown $(id -u):$(id -g) $HOME/.kube/config
+
+- name: Install Network Add-on
+  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+

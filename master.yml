@@ -1,0 +1,9 @@
+---
+- name: Install and Configure Master node server
+  hosts: all
+  user: vagrant
+  become: true
+  gather_facts: yes
+  roles:
+    - k8s.master-role
+  

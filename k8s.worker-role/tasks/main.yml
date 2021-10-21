@@ -1,0 +1,25 @@
+---
+# tasks file for esiedge.k8s.worker
+#
+- name: configure some prerequist
+  include_tasks: prerequist.yml
+
+
+- name: install and configure k8s
+  include_tasks: install_k8s.yml
+
+
+
+- name: setup nfs_client
+  include_tasks: nfs_client.yml
+
+    
+
+- name: joining worker with k8s master
+  shell: "{{item}}"
+  loop:  
+    - cat /home/vagrant/mnt/join_tocken > out.sh
+    - sh out.sh
+
+
+

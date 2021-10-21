@@ -1,0 +1,23 @@
+---
+# vars file for esiedge.k8s.worker
+#
+#required_packages:
+#  - device-mapper-persistant-data 
+#  - lvm2
+
+k8s_packages:
+  - kubeadm
+  - kubelet
+  - kubectl
+
+services:
+  - firewalld
+  - kubelet
+
+
+worker_ports:
+ - 179/tcp
+ - 10250/tcp
+ - 30000-32767/tcp
+ - 6443/tcp  
+

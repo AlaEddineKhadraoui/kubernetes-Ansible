@@ -1,0 +1,47 @@
+---
+
+- name: setting a repo for k8s
+  yum_repository:
+      name: Kubernetes
+      description: a repo file for k8s
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      enabled: true
+      gpgcheck: true
+      repo_gpgcheck: true
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+     
+
+- name: install k8s required packages
+  yum:
+    name: "{{k8s_packages}}"
+    state: present
+      #disable_gpg_check: false   
+
+
+- name: start and enable required services
+  service:
+    name: "{{item}}"
+    state: started
+    enabled: yes
+  loop: "{{services}}" 
+
+
+- name: Allow network ports in firewalld
+  firewalld:
+    port: "{{item}}"
+    state: enabled
+    permanent: yes
+  loop: "{{worker_ports}}"  
+  notify: reload firewall
+
+- name: Allow masquerading in firewalld    
+  firewalld:
+    masquerade: "yes"
+    state: enabled
+    permanent: yes
+  notify: reload firewall
+
+- name: Enabling bridge firewall rule
+  shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"  
+      
+

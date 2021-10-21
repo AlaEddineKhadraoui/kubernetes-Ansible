@@ -1,0 +1,60 @@
+---
+# tasks file for esiedge.k8s.master
+#
+- name: configure some prerequist
+  include_tasks: prerequist.yml
+
+
+- name: install and configure k8s
+  include_tasks: install_k8s.yml
+
+
+- name: setup nfs server
+  include_tasks: nfs_server.yml
+
+#- name: stop firewall
+#  service:
+#    name: firewalld
+#    state: stopped
+
+- name: intializing k8s cluster
+  shell: kubeadm init
+  ignore_errors: true
+  
+
+- name: Setup kubeconfig for vagrant user
+  shell: "{{ item }}"
+  loop:
+     - mkdir -p /home/vagrant/.kube
+     - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+     - chown vagrant:vagrant /home/vagrant/.kube/config
+
+
+- name: generating a join command
+  shell: kubeadm token create --print-join-command
+  register: join_command
+
+
+- name: creating file to store tocken
+  file:
+    path: /home/vagrant/nfs/join_tocken
+    state: touch
+
+- name: copy tocken to a file
+  copy:
+    content: "{{ join_command.stdout }}"
+    dest: /home/vagrant/nfs/join_tocken
+
+
+
+
+- name: install pod network
+  shell: kubectl apply -f https://docs.projectcalico.org/archive/v3.17/manifests/calico.yaml
+      
+
+
+
+
+
+
+
