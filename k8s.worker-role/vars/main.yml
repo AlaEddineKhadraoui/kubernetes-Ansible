@@ -20,4 +20,4 @@ worker_ports:
  - 10250/tcp
  - 30000-32767/tcp
  - 6443/tcp  
-
+ - 2049/tcp
